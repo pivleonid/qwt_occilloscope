@@ -58,6 +58,30 @@
 
 #include <QtSerialPort/QSerialPort>
 
+
+#include <qwt_plot.h>
+#include <qwt_plot_grid.h>
+
+#include <qwt_legend.h>
+
+#include <qwt_plot_curve.h>
+#include <qwt_symbol.h>
+
+#include <qwt_plot_magnifier.h>
+
+#include <qwt_plot_panner.h>
+
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
+//--//
+#include <qwt_plot_curve.h>
+
+#include <qwt_plot_directpainter.h>
+#include <qwt_system_clock.h>
+
+#include <QTimer>
+#include <QTime>
+
 QT_BEGIN_NAMESPACE
 
 class QLabel;
@@ -87,6 +111,8 @@ private slots:
     void readData();
 
     void handleError(QSerialPort::SerialPortError error);
+    void updateTime();
+    void plot_time_update();
 
 private:
     void initActionsConnections();
@@ -99,6 +125,12 @@ private:
     Console *console;
     SettingsDialog *settings;
     QSerialPort *serial;
+    //QwtPlot *ui->qwtPlot; QwtPlotCurve *curve;
+    QTimer *tmr;
+    QPolygonF points;
+ QwtPlotCurve *curve;
+    QByteArray data;
+ //   QVector<int> x;//(200); //данные по Qserialport
 };
 
 #endif // MAINWINDOW_H
