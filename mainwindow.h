@@ -79,6 +79,8 @@
 #include <qwt_plot_directpainter.h>
 #include <qwt_system_clock.h>
 
+#include <qwt_interval.h>
+
 #include <QTimer>
 #include <QTime>
 
@@ -131,6 +133,7 @@ private:
     QPolygonF points;
     QwtPlotCurve *curve;
     QByteArray data, trigger_data;
+    QVector<float> data_f;
     //
     const int max_trigger = 200, min_trigger = 0;
     bool port_close = false;

@@ -81,11 +81,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->qwtPlot->setTitle("Частоты до 200 КГц");
     ui->qwtPlot->setCanvasBackground( Qt::white );
     // Параметры осей координат
-      ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "U");
-      ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "time");
+      ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "U, мВ");
+      ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "time, us");
+
+
       //мин и макс осей
-      ui->qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 70);
-      ui->qwtPlot->setAxisScale(QwtPlot::xBottom,0,200);
+      ui->qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 4, 0.1);
+      ui->qwtPlot->setAxisScale(QwtPlot::xBottom,0,280, 5);
       ui->qwtPlot->insertLegend( new QwtLegend() );
 
 
@@ -255,7 +257,11 @@ void MainWindow::writeData(const QByteArray &data)
 void MainWindow::readData()
 {
     data = serial->readAll();
-//    for (int i = 0; i < 200 ; i++)
+    for (int i = 0; i < 200; i++) {
+        data_f.append(data.at(i));
+    }
+   for (int i = 0; i < 200 ; i++)
+       data_f[i] *= 0.0515;
 //    x[i] = i;
 
 //    for(int i = 0; i < 200; i++){
@@ -283,12 +289,13 @@ void MainWindow::plot_time_update(){
     points.clear();
     static int count = 0;
     //
-    QVector<int> x(200);
+    QVector<float> x(200);
     for (int i = 0; i < 200 ; i++)
-        x[i] = i;
+        x[i] = i * 1.4;
 //
     for(int i = 0; i <= count; i++){
-        points << QPointF(x[i], data[i]);
+        data_f[i] = data_f[i];// * 0.0515;
+        points << QPointF(x[i], data_f[i]);
     }
 
     count++;
