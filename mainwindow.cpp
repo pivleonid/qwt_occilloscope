@@ -78,11 +78,11 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->qwtPlot = new QwtPlot(this);
 
     //setCentralWidget(ui->qwtPlot);
-    ui->qwtPlot->setTitle("Частоты до 1 КГц");
+    ui->qwtPlot->setTitle("Частоты до 200 КГц");
     ui->qwtPlot->setCanvasBackground( Qt::white );
     // Параметры осей координат
-      ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "Y");
-      ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "X");
+      ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "U");
+      ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "time");
       //мин и макс осей
       ui->qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 70);
       ui->qwtPlot->setAxisScale(QwtPlot::xBottom,0,200);
@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
        // Маркеры кривой
        // #include <qwt_symbol.h>
        QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Hexagon,
-           QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 16, 16 ) );
+           QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
        curve->setSymbol( symbol );
 
         // Включить возможность приближения/удаления графика
@@ -174,9 +174,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(console, &Console::getData, this, &MainWindow::writeData);
 //! [3]
 //!
-ui->lineEdit->setEnabled(false);
+ui->spinBox->setEnabled(true);
 ui->save_plot_in_jpeg->setEnabled(false);
+ui->spinBox->setRange(0,65);
+ui->spinBox->setValue(0);
+ui->verticalScrollBar->setRange(0,65);
+ui->verticalScrollBar->setValue(0);
 
+connect(ui->set_trigger,SIGNAL(clicked(bool)),this,SLOT(activate_curve_trigger()));
+connect(ui->verticalScrollBar, SIGNAL(valueChanged(int)),ui->spinBox,SLOT(setValue(int)));
+connect(ui->spinBox, SIGNAL(valueChanged(int)),ui->verticalScrollBar,SLOT(setValue(int)));
 }
 //! [3]
 
@@ -218,12 +225,14 @@ void MainWindow::closeSerialPort()
 {
 
     //if (serial->isOpen())
+    port_close = true;
         serial->close();
     console->setEnabled(false);
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
     showStatusMessage(tr("Disconnected"));
+
 }
 //! [5]
 
@@ -265,6 +274,12 @@ void MainWindow::readData()
 
 }
 void MainWindow::plot_time_update(){
+    if( port_close == true){
+        tmr->stop();
+        port_close = false;
+        serial->close();
+    }
+
     points.clear();
     static int count = 0;
     //
@@ -351,4 +366,34 @@ void MainWindow::updateTime(){
     i++;
 
 
+}
+
+void MainWindow::activate_curve_trigger(){
+
+
+    ui->spinBox->setEnabled(true);
+    // Кривая
+     //#include <qwt_plot_curve.h>
+     curve = new QwtPlotCurve();
+     curve->setTitle( "Триггер" );
+     curve->setPen( Qt::red, 6 ); // цвет и толщина кривой
+     curve->setRenderHint
+             ( QwtPlotItem::RenderAntialiased, true ); // сглаживание
+
+     // Маркеры кривой
+     // #include <qwt_symbol.h>
+     QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Hexagon,
+         QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
+     curve->setSymbol( symbol );
+     //
+     QVector<int> x(200);
+     for (int i = 0; i < 200 ; i++)
+         x[i] = i;
+ //
+     for(int i = 0; i <= 200; i++){
+         points << QPointF(x[i], trigger_data[i]);
+     }
+     curve->setSamples( points ); // ассоциировать набор точек с кривой
+     curve->attach(ui->qwtPlot);
+     ui->qwtPlot->replot();
 }

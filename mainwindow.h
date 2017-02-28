@@ -113,6 +113,7 @@ private slots:
     void handleError(QSerialPort::SerialPortError error);
     void updateTime();
     void plot_time_update();
+    void activate_curve_trigger();
 
 private:
     void initActionsConnections();
@@ -128,9 +129,11 @@ private:
     //QwtPlot *ui->qwtPlot; QwtPlotCurve *curve;
     QTimer *tmr;
     QPolygonF points;
- QwtPlotCurve *curve;
-    QByteArray data;
- //   QVector<int> x;//(200); //данные по Qserialport
+    QwtPlotCurve *curve;
+    QByteArray data, trigger_data;
+    //
+    const int max_trigger = 200, min_trigger = 0;
+    bool port_close = false;
 };
 
 #endif // MAINWINDOW_H
