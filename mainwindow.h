@@ -113,12 +113,14 @@ private slots:
     void readData();
 
     void handleError(QSerialPort::SerialPortError error);
-    void updateTime();
     void plot_time_update();
-    void activate_curve_trigger();
+    void activate_curve_trigger(double);
+
 
 private:
     void initActionsConnections();
+    void my_connect_begin();  //мои дописки
+    void my_connect_end();
 
 private:
     void showStatusMessage(const QString &message);
@@ -132,9 +134,10 @@ private:
     QTimer *tmr;
     QPolygonF points;
     QwtPlotCurve *curve;
+    QwtPlotCurve* curve_trig;
     QByteArray data, trigger_data;
     QVector<float> data_f;
-    //
+    float y;
     const int max_trigger = 200, min_trigger = 0;
     bool port_close = false;
 };
