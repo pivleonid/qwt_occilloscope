@@ -200,6 +200,9 @@ void MainWindow::my_connect_begin(){
      ui->qwtPlot->replot();
 }
 void MainWindow::my_connect_end(){
+
+
+
     ui->save_plot_in_jpeg->setEnabled(false);
     ui->doubleSpinBox->setRange(0,4);
     ui->doubleSpinBox->setSingleStep(0.1);
@@ -210,6 +213,10 @@ void MainWindow::my_connect_end(){
 
     tmr = new QTimer;
     connect(tmr, SIGNAL(timeout()), this, SLOT(plot_time_update()));
+
+    ui->doubleSpinBox->setEnabled(false); //спинбокс неактивен
+    connect(ui->set_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_active()));
+    connect(ui->delete_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_deactive()));
 }
 
 MainWindow::~MainWindow()
@@ -351,15 +358,26 @@ void MainWindow::showStatusMessage(const QString &message)
 void MainWindow::activate_curve_trigger(double trigger){
 
     points.clear();
-    points << QPointF( 0,   trigger ) // координаты x, y
+    points << QPointF(   0, trigger ) // координаты x, y
            << QPointF( 280, trigger );
     curve_trig->setSamples( points ); // ассоциировать набор точек с кривой
     curve_trig->attach(ui->qwtPlot);
     ui->qwtPlot->replot();
 }
 
+void MainWindow::doubleSpinBox_active(){
+    ui->doubleSpinBox->setEnabled(true);
+    //функция выключения картинки с экрана и ожидание данных, выше порогового значения
+}
 
-
+void MainWindow::doubleSpinBox_deactive(){
+    ui->doubleSpinBox->setEnabled(false);
+    points.clear();
+    //функция включения нормального режима
+    curve_trig->setSamples( points ); // ассоциировать набор точек с кривой
+    curve_trig->attach(ui->qwtPlot);
+    ui->qwtPlot->replot();
+}
 
 
 

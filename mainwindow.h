@@ -115,6 +115,8 @@ private slots:
     void handleError(QSerialPort::SerialPortError error);
     void plot_time_update();
     void activate_curve_trigger(double);
+    void doubleSpinBox_active(void);
+    void doubleSpinBox_deactive(void);
 
 
 private:
@@ -137,8 +139,6 @@ private:
     QwtPlotCurve* curve_trig;
     QByteArray data, trigger_data;
     QVector<float> data_f;
-    float y;
-    const int max_trigger = 200, min_trigger = 0;
     bool port_close = false;
 };
 
