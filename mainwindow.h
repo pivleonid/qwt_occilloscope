@@ -121,7 +121,8 @@ private slots:
 
 private:
     void initActionsConnections();
-    void my_connect_begin();  //мои дописки
+    //Функции для удобства восприятия
+    void my_connect_begin();
     void my_connect_end();
 
 private:
@@ -135,11 +136,23 @@ private:
     //QwtPlot *ui->qwtPlot; QwtPlotCurve *curve;
     QTimer *tmr;
     QPolygonF points;
+    //кривая АЦП
     QwtPlotCurve *curve;
+    //кривая триггера
     QwtPlotCurve* curve_trig;
-    QByteArray data, trigger_data;
+
+    QByteArray data; //контейнер данных с VCP
+    //Преобразование входных данных data в тип float
+    // Для нормирования значений к 3.3 вольтам
     QVector<float> data_f;
+    //Данные
+    double trigger;
+  /*==--  //флаги\\ --==*/
+    //флаг для корректного откытия/закрытия порта по таймеру
     bool port_close = false;
+    bool trigger_active = false;
+    //если значение выше порогового- вывод всех последующих значений
+    bool curve_trigger = false;
 };
 
 #endif // MAINWINDOW_H

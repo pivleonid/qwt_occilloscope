@@ -269,10 +269,12 @@ void MainWindow::closeSerialPort()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About Simple Terminal"),
-                       tr("The <b>Simple Terminal</b> example demonstrates how to "
-                          "use the Qt Serial Port module in modern GUI applications "
-                          "using Qt, with a menu bar, toolbars, and a status bar."));
+    QMessageBox::about(this, tr("На основе Simple Terminal"),
+                       tr("В приложении использована библиотека QWT   \n"
+                          "       http://qwt.sourceforge.net/         \n"
+                          "       Микроконтроллер STM32F407           \n"
+                          "Особую благодарность за идею и вдохносление\n"
+                          "выражаю к.т.н. Михаилу Рощупкину         "));
 }
 
 //! [6]
@@ -295,6 +297,7 @@ void MainWindow::readData()
     serial->close();
     tmr->start(10);
 }
+//Вывод графика по таймеру для красоты
 void MainWindow::plot_time_update(){
     if( port_close == true){
         tmr->stop();
@@ -303,12 +306,14 @@ void MainWindow::plot_time_update(){
     }
 
     points.clear();
+    //вывод без триггера
     static int count = 0;
-    //
+
     QVector<float> x(200);
     for (int i = 0; i < 200 ; i++)
         x[i] = i * 1.4;
 
+    if ( trigger_active == false){
     for(int i = 0; i <= count; i++)
         points << QPointF(x[i], data_f[i]);
     count++;
@@ -316,7 +321,27 @@ void MainWindow::plot_time_update(){
         count = 0;
         tmr->stop();
         serial->open(QIODevice::ReadWrite);
-
+    }
+    }
+    //вывод с триггером
+    if ( trigger_active == true){
+        for(int i = 0; i <= count; i++){
+            //вернуть размер точек
+            if (data_f[i] > trigger)
+                points << QPointF(x[i], data_f[i]);
+            else {
+           data_f[i] = 0;
+           points << QPointF(x[i], data_f[i]);
+            }
+            //сделать точки мельше!
+        }
+        count++;
+        if(count >= 200){
+            count = 0;
+            tmr->stop();
+            //придумать ожидание нажатия кнопки
+            serial->open(QIODevice::ReadWrite);
+        }
     }
     curve->setSamples( points ); // ассоциировать набор точек с кривой
     curve->attach(ui->qwtPlot);
@@ -354,9 +379,9 @@ void MainWindow::showStatusMessage(const QString &message)
 
 
 
-
-void MainWindow::activate_curve_trigger(double trigger){
-
+//перемещает уровень триггера на графике
+void MainWindow::activate_curve_trigger(double trig){
+    trigger = trig; //иначе переменную не видно в обработчике прерывания по таймеру
     points.clear();
     points << QPointF(   0, trigger ) // координаты x, y
            << QPointF( 280, trigger );
@@ -364,14 +389,16 @@ void MainWindow::activate_curve_trigger(double trigger){
     curve_trig->attach(ui->qwtPlot);
     ui->qwtPlot->replot();
 }
-
+//функция выключения картинки с экрана и ожидание данных, выше порогового значения
 void MainWindow::doubleSpinBox_active(){
     ui->doubleSpinBox->setEnabled(true);
-    //функция выключения картинки с экрана и ожидание данных, выше порогового значения
+    trigger_active = true;
+
 }
 
 void MainWindow::doubleSpinBox_deactive(){
     ui->doubleSpinBox->setEnabled(false);
+    trigger_active = false;
     points.clear();
     //функция включения нормального режима
     curve_trig->setSamples( points ); // ассоциировать набор точек с кривой
