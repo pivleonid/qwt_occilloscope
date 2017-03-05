@@ -208,7 +208,7 @@ void MainWindow::my_connect_begin(){
 //!         Настройка коннектов и кнопочек
 //!
 void MainWindow::my_connect_end(){
-    ui->save_plot_in_jpeg->setEnabled(false);
+    ui->save_plot_in_jpeg->setEnabled(true);
     ui->doubleSpinBox->setEnabled(false); //спинбокс неактивен
     ui->continue_plot->setEnabled(false);
     ui->doubleSpinBox->setRange(0,4);
@@ -223,6 +223,8 @@ void MainWindow::my_connect_end(){
 
     tmr = new QTimer;
     connect(tmr, SIGNAL(timeout()), this, SLOT(plot_time_update()));
+
+    connect(ui->save_plot_in_jpeg, SIGNAL(clicked(bool)), this, SLOT(save_plot()));
 }
 
 MainWindow::~MainWindow()
@@ -441,7 +443,15 @@ void MainWindow::doubleSpinBox_deactive(){
     ui->qwtPlot->replot();
 }
 
+void MainWindow::save_plot(){
 
+   // QPixmap screen = QPixmap::grabWindow(ui->qwtPlot->width(),ui-> qwtPlot->height());
+    QPixmap screen(ui->qwtPlot->width(),ui-> qwtPlot->height());
+      QString fileName = QFileDialog::getSaveFileName(0, "Сохранить как...", QDir::currentPath(), "All types(*.*);;PNG (*.png);;JPG (*jpeg *jpg);; BMP (*.bmp)");
+      if (fileName.isNull())
+        return;
+      screen.save(fileName,0,100);
+}
 
 
 

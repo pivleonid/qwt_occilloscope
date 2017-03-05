@@ -84,6 +84,8 @@
 #include <QTimer>
 #include <QTime>
 
+#include <QDir>
+#include <QFileDialog>
 QT_BEGIN_NAMESPACE
 
 class QLabel;
@@ -118,6 +120,7 @@ private slots:
     void doubleSpinBox_active(void);
     void doubleSpinBox_deactive(void);
     void continue_Trigger_mode(void);
+    void save_plot();
 
 private:
     void initActionsConnections();
