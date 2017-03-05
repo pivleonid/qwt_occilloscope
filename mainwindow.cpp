@@ -217,7 +217,6 @@ void MainWindow::my_connect_end(){
     ui->verticalScrollBar->setRange(0,4);
     ui->verticalScrollBar->setValue(0);
     connect(ui->doubleSpinBox, SIGNAL(valueChanged(double)),this,SLOT(activate_curve_trigger(double)));
-
     connect(ui->set_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_active()));
     connect(ui->delete_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_deactive()));
     connect(ui->continue_plot,SIGNAL(clicked(bool)),this,SLOT(continue_Trigger_mode()));
