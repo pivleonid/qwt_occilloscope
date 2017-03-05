@@ -117,7 +117,7 @@ private slots:
     void activate_curve_trigger(double);
     void doubleSpinBox_active(void);
     void doubleSpinBox_deactive(void);
-
+    void continue_Trigger_mode(void);
 
 private:
     void initActionsConnections();
@@ -144,12 +144,10 @@ private:
     QByteArray data; //контейнер данных с VCP
     //Преобразование входных данных data в тип float
     // Для нормирования значений к 3.3 вольтам
-    QVector<float> data_f;
+    QVector<float> data_f, x;
     //Данные
-    double trigger;
+    double trigger; //сохраняет значение триггера
   /*==--  //флаги\\ --==*/
-    //флаг для корректного откытия/закрытия порта по таймеру
-    bool port_close = false;
     bool trigger_active = false;
     //если значение выше порогового- вывод всех последующих значений
     bool curve_trigger = false;

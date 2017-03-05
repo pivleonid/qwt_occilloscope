@@ -63,7 +63,7 @@
 #include <QDebug>
 #include <QVector>
 
-//
+//!         Конструктор базового класса
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -74,8 +74,16 @@ MainWindow::MainWindow(QWidget *parent) :
     console = new Console;
     console->setEnabled(false);
 
+        for (int i = 0; i < 200 ; i++){
+           x.append(i);
+           x[i] *= 1.4;
+        }
+/*
+ *     QVector<int>::iterator i = 0;
+        for (int i = 0; i < 200 ; i++)
+           x.append(i);
 
-
+ */
     //! [1]
     serial = new QSerialPort(this);
     //! [1]
@@ -105,14 +113,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 //! [3]
+//!         Настройка отображения
+//!
 void MainWindow::my_connect_begin(){
-    //  setCentralWidget(console);
-    /*HELLO QWT*/
-    //ui->qwtPlot = new QwtPlot(this);
 
-    //setCentralWidget(ui->qwtPlot);
     ui->qwtPlot->setTitle("Частоты до 200 КГц");
-    ui->qwtPlot->setCanvasBackground( Qt::white );
+    ui->qwtPlot->setCanvasBackground( Qt::black );
     // Параметры осей координат
     ui->qwtPlot->setAxisTitle(QwtPlot::yLeft, "U, мВ");
     ui->qwtPlot->setAxisTitle(QwtPlot::xBottom, "time, us");
@@ -127,10 +133,11 @@ void MainWindow::my_connect_begin(){
     // Включить сетку
     // #include <qwt_plot_grid.h>
     QwtPlotGrid *grid = new QwtPlotGrid(); //
-    grid->setMajorPen(QPen( Qt::gray, 2,Qt::DotLine)); // цвет линий и толщина
+    grid->setMajorPen(QPen( Qt::white, 2,Qt::DotLine)); // цвет линий и толщина
     grid->attach( ui->qwtPlot ); // добавить сетку к полю графика
 
-    // Кривая
+    //-- Кривая АЦП --//
+
     //#include <qwt_plot_curve.h>
     curve = new QwtPlotCurve();
     curve->setTitle( "Канал 1" );
@@ -141,8 +148,25 @@ void MainWindow::my_connect_begin(){
     // Маркеры кривой
     // #include <qwt_symbol.h>
     QwtSymbol *symbol = new QwtSymbol( QwtSymbol::Hexagon,
-                                       QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
+                                       QBrush( Qt::blue ), QPen( Qt::red, 2 ), QSize( 1, 1 ) );
     curve->setSymbol( symbol );
+
+    //--График триггера--//
+
+    //#include <qwt_plot_curve.h>
+    curve_trig = new QwtPlotCurve();
+    curve_trig->setTitle( "Триггер" );
+    curve_trig->setPen( Qt::yellow, 6 ); // цвет и толщина кривой
+    curve_trig->setRenderHint
+            ( QwtPlotItem::RenderAntialiased, true ); // сглаживание
+
+    // Маркеры кривой
+    // #include <qwt_symbol.h>
+    QwtSymbol *symbol_trig = new QwtSymbol( QwtSymbol::Hexagon,
+                                            QBrush( Qt::yellow ), QPen( Qt::yellow, 0 ), QSize( 0,0  ) );
+    curve_trig->setSymbol( symbol_trig );
+
+    //--Остальная Настройка--
 
     // Включить возможность приближения/удаления графика
     // #include <qwt_plot_magnifier.h>
@@ -178,32 +202,15 @@ void MainWindow::my_connect_begin(){
     // непосредственное включение вышеописанных функций
     d_picker->setStateMachine( new QwtPickerDragPointMachine() );
 
-
-
-
-    //
-    //  ui->spinBox->setEnabled(true);
-    // Кривая
-    //#include <qwt_plot_curve.h>
-    curve_trig = new QwtPlotCurve();
-    curve_trig->setTitle( "Триггер" );
-    curve_trig->setPen( Qt::yellow, 6 ); // цвет и толщина кривой
-    curve_trig->setRenderHint
-            ( QwtPlotItem::RenderAntialiased, true ); // сглаживание
-
-    // Маркеры кривой
-    // #include <qwt_symbol.h>
-    QwtSymbol *symbol_trig = new QwtSymbol( QwtSymbol::Hexagon,
-                                            QBrush( Qt::yellow ), QPen( Qt::red, 2 ), QSize( 8, 8 ) );
-    curve_trig->setSymbol( symbol_trig );
-
-     ui->qwtPlot->replot();
+    ui->qwtPlot->replot();
 }
+
+//!         Настройка коннектов и кнопочек
+//!
 void MainWindow::my_connect_end(){
-
-
-
     ui->save_plot_in_jpeg->setEnabled(false);
+    ui->doubleSpinBox->setEnabled(false); //спинбокс неактивен
+    ui->continue_plot->setEnabled(false);
     ui->doubleSpinBox->setRange(0,4);
     ui->doubleSpinBox->setSingleStep(0.1);
     ui->doubleSpinBox->setValue(0);
@@ -211,12 +218,12 @@ void MainWindow::my_connect_end(){
     ui->verticalScrollBar->setValue(0);
     connect(ui->doubleSpinBox, SIGNAL(valueChanged(double)),this,SLOT(activate_curve_trigger(double)));
 
-    tmr = new QTimer;
-    connect(tmr, SIGNAL(timeout()), this, SLOT(plot_time_update()));
-
-    ui->doubleSpinBox->setEnabled(false); //спинбокс неактивен
     connect(ui->set_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_active()));
     connect(ui->delete_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_deactive()));
+    connect(ui->continue_plot,SIGNAL(clicked(bool)),this,SLOT(continue_Trigger_mode()));
+
+    tmr = new QTimer;
+    connect(tmr, SIGNAL(timeout()), this, SLOT(plot_time_update()));
 }
 
 MainWindow::~MainWindow()
@@ -256,8 +263,8 @@ void MainWindow::openSerialPort()
 //! [5]
 void MainWindow::closeSerialPort()
 {
-    port_close = true;
-        serial->close();
+    tmr->stop();
+    serial->close();
     console->setEnabled(false);
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
@@ -269,7 +276,7 @@ void MainWindow::closeSerialPort()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("На основе Simple Terminal"),
+    QMessageBox::about(this, tr("Программа выполнена с использованием Simple Terminal"),
                        tr("В приложении использована библиотека QWT   \n"
                           "       http://qwt.sourceforge.net/         \n"
                           "       Микроконтроллер STM32F407           \n"
@@ -287,67 +294,96 @@ void MainWindow::writeData(const QByteArray &data)
 //! [7]
 void MainWindow::readData()
 {
-    data_f.clear();// очистка контейнера
+    //data имеет тип QByteArray
     data = serial->readAll();
+    serial->close();
+    //Заполнение контейнера Qvector'a знчениями типа float
+    data_f.clear();// очистка контейнера
+    //QbyteArray перевожу в Qvector <float>
     for (int i = 0; i < 200; i++) {
         data_f.append(data.at(i));
+        data_f[i] *= 0.0515;
     }
-   for (int i = 0; i < 200 ; i++)
-       data_f[i] *= 0.0515;
-    serial->close();
+    //Приняли значения, закрыли порт, включили таймер
     tmr->start(10);
 }
+
 //Вывод графика по таймеру для красоты
 void MainWindow::plot_time_update(){
-    if( port_close == true){
-        tmr->stop();
-        port_close = false;
-        serial->close();
-    }
-
+    tmr->stop();//остановка таймера
     points.clear();
-    //вывод без триггера
+    //Счетчик времени. Эта переменная видна и сохраняется
+    // только в этой функции
     static int count = 0;
-
-    QVector<float> x(200);
-    for (int i = 0; i < 200 ; i++)
-        x[i] = i * 1.4;
-
+     //вывод без триггера
     if ( trigger_active == false){
-    for(int i = 0; i <= count; i++)
+        curve->setPen( Qt::blue, 6 ); // цвет и толщина кривой
+    for(int i = 0; i <= count; i++){
         points << QPointF(x[i], data_f[i]);
-    count++;
-    if(count >= 200){
-        count = 0;
-        tmr->stop();
-        serial->open(QIODevice::ReadWrite);
     }
+    count++;
+        if(count >= 200){
+            count = 0;
+            serial->open(QIODevice::ReadWrite);
+            return;
+        }
     }
     //вывод с триггером
     if ( trigger_active == true){
+
         for(int i = 0; i <= count; i++){
+             curve->setPen( Qt::red, 6 ); // цвет и толщина кривой
             //вернуть размер точек
-            if (data_f[i] > trigger)
-                points << QPointF(x[i], data_f[i]);
-            else {
-           data_f[i] = 0;
-           points << QPointF(x[i], data_f[i]);
-            }
-            //сделать точки мельше!
+             if (data_f[i] > trigger){
+                 points << QPointF(x[i], data_f[i]);
+                 curve_trigger = true;
+             }
+             if (data_f[i] < trigger && curve_trigger == true)
+                 points << QPointF(x[i], data_f[i]);
+             if (data_f[i] < trigger && curve_trigger == false){
+                 data_f[i] = 0;
+                 points << QPointF(x[i], data_f[i]);
+             }
         }
         count++;
         if(count >= 200){
             count = 0;
-            tmr->stop();
-            //придумать ожидание нажатия кнопки
-            serial->open(QIODevice::ReadWrite);
+            //Ежели произошел "захват сигнала" (Сигнал выше уровня триггера)
+            if (curve_trigger == true){
+                curve_trigger = false;
+                //придумать ожидание нажатия кнопки
+                serial->close();
+                // ассоциировать набор точек с кривой
+                curve->setSamples( points );
+                //добавить кривую на график
+                curve->attach(ui->qwtPlot);
+                //перерисовать график
+                ui->qwtPlot->replot();
+                //активирую кнопочку "Продолжить"
+                ui->continue_plot->setEnabled(true);
+                return;
+            }
+            //Если сигнала выше уровня триггера не было- продолжаем поиск
+            else{
+                serial->open(QIODevice::ReadWrite);
+                return;
+            }
         }
     }
-    curve->setSamples( points ); // ассоциировать набор точек с кривой
+
+    // ассоциировать набор точек с кривой
+    curve->setSamples( points );
+    //добавить кривую на график
     curve->attach(ui->qwtPlot);
+    //перерисовать график
     ui->qwtPlot->replot();
+    tmr->start(10);
+
 }
 //! [7]
+void MainWindow::continue_Trigger_mode(){
+    serial->open(QIODevice::ReadWrite);
+}
 
 //! [8]
 void MainWindow::handleError(QSerialPort::SerialPortError error)

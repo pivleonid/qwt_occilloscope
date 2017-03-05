@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    w.setStyleSheet("QMainWindow { background: #006060}");
     w.show();
+
     return a.exec();
 }
