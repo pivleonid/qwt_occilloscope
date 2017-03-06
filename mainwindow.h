@@ -96,7 +96,7 @@ class MainWindow;
 
 QT_END_NAMESPACE
 
-class Console;
+//class Console;
 class SettingsDialog;
 
 class MainWindow : public QMainWindow
@@ -133,10 +133,8 @@ private:
 
     Ui::MainWindow *ui;
     QLabel *status;
-    Console *console;
     SettingsDialog *settings;
     QSerialPort *serial;
-    //QwtPlot *ui->qwtPlot; QwtPlotCurve *curve;
     QTimer *tmr;
     QPolygonF points;
     //кривая АЦП

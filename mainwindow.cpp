@@ -51,11 +51,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "console.h"
 #include "settingsdialog.h"
-//
-
-//
 
 #include <QLabel>
 #include <QtSerialPort/QSerialPort>
@@ -71,19 +67,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     //! [0]
     ui->setupUi(this);
-    console = new Console;
-    console->setEnabled(false);
 
         for (int i = 0; i < 200 ; i++){
            x.append(i);
            x[i] *= 1.4;
         }
-/*
- *     QVector<int>::iterator i = 0;
-        for (int i = 0; i < 200 ; i++)
-           x.append(i);
 
- */
     //! [1]
     serial = new QSerialPort(this);
     //! [1]
@@ -105,7 +94,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //! [2]
     connect(serial, &QSerialPort::readyRead, this, &MainWindow::readData);
 //! [2]
-    connect(console, &Console::getData, this, &MainWindow::writeData);
 //! [3]
     //!
     my_connect_begin();
@@ -244,8 +232,6 @@ void MainWindow::openSerialPort()
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
     if (serial->open(QIODevice::ReadWrite)) {
-        console->setEnabled(true);
-        console->setLocalEchoEnabled(p.localEchoEnabled);
         ui->actionConnect->setEnabled(false);
         ui->actionDisconnect->setEnabled(true);
         ui->actionConfigure->setEnabled(false);
@@ -266,7 +252,6 @@ void MainWindow::closeSerialPort()
 {
     tmr->stop();
     serial->close();
-    console->setEnabled(false);
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
@@ -402,7 +387,7 @@ void MainWindow::initActionsConnections()
     connect(ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
     connect(ui->actionConfigure, &QAction::triggered, settings, &MainWindow::show);
-    connect(ui->actionClear, &QAction::triggered, console, &Console::clear);
+    //connect(ui->actionClear, &QAction::triggered, console, &Console::clear);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 }
@@ -444,13 +429,12 @@ void MainWindow::doubleSpinBox_deactive(){
 }
 
 void MainWindow::save_plot(){
-
-   // QPixmap screen = QPixmap::grabWindow(ui->qwtPlot->width(),ui-> qwtPlot->height());
     QPixmap screen(ui->qwtPlot->width(),ui-> qwtPlot->height());
-      QString fileName = QFileDialog::getSaveFileName(0, "Сохранить как...", QDir::currentPath(), "All types(*.*);;PNG (*.png);;JPG (*jpeg *jpg);; BMP (*.bmp)");
-      if (fileName.isNull())
+    screen = QPixmap::grabWidget(ui->qwtPlot);
+    QString fileName = QFileDialog::getSaveFileName(0, "Сохранить как...", QDir::currentPath(), "All types(*.*);;PNG (*.png);;JPG (*jpeg *jpg);; BMP (*.bmp)");
+    if (fileName.isNull())
         return;
-      screen.save(fileName,0,100);
+    screen.save(fileName,0,100);
 }
 
 
