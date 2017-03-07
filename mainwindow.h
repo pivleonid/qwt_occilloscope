@@ -53,40 +53,33 @@
 #define MAINWINDOW_H
 
 #include <QtCore/QtGlobal>
-
 #include <QMainWindow>
-
 #include <QtSerialPort/QSerialPort>
 
 
-#include <qwt_plot.h>
-#include <qwt_plot_grid.h>
-
-#include <qwt_legend.h>
-
-#include <qwt_plot_curve.h>
-#include <qwt_symbol.h>
-
-#include <qwt_plot_magnifier.h>
-
-#include <qwt_plot_panner.h>
-
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-//--//
-#include <qwt_plot_curve.h>
-
-#include <qwt_plot_directpainter.h>
-#include <qwt_system_clock.h>
-
-#include <qwt_interval.h>
-
-#include <QTimer>
-#include <QTime>
-
-#include <QDir>
-#include <QFileDialog>
 QT_BEGIN_NAMESPACE
+//Предварительное объявление классов
+class QwtPlot;
+class QwtPlotGrid;
+class QwtLegend;
+class QwtPlotCurve;
+class QwtSymbol;
+class QwtPlotMagnifier;
+class QwtPlotPanner;
+class QwtPlotPicker;
+class QwtPickerMachine;
+class QwtPlotCurve;
+class QwtPlotDirectPainter;
+class QwtSystemClock;
+class QwtInterval;
+
+class QTimer;
+class QDir;
+class QFileDialog;
+
+class doubleSlider;
+
+
 
 class QLabel;
 

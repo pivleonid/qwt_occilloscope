@@ -28,6 +28,8 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+
+#include <doubleslider.h>
 #include "qwt_plot.h"
 
 QT_BEGIN_NAMESPACE
@@ -74,7 +76,8 @@ public:
     QPushButton *save_plot_in_jpeg;
     QSpacerItem *horizontalSpacer_2;
     QVBoxLayout *verticalLayout_5;
-    QScrollBar *verticalScrollBar;
+   // QScrollBar *verticalScrollBar;
+    doubleSlider* verticalScrollBar;
     QSpacerItem *verticalSpacer_5;
     QPushButton *button_pause;
     QPushButton *button_udate;
@@ -287,7 +290,8 @@ public:
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
-        verticalScrollBar = new QScrollBar(centralWidget);
+        //verticalScrollBar = new QScrollBar(centralWidget);
+        verticalScrollBar = new doubleSlider(centralWidget);
         verticalScrollBar->setObjectName(QStringLiteral("verticalScrollBar"));
         verticalScrollBar->setOrientation(Qt::Vertical);
 

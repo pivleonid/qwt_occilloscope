@@ -6,11 +6,13 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    doubleslider.cpp
 
 HEADERS += \
     mainwindow.h \
     settingsdialog.h \
+    doubleslider.h
 
 
 FORMS += \

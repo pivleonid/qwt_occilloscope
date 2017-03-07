@@ -58,6 +58,41 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QVector>
+//
+
+
+#include <QMainWindow>
+#include <QtSerialPort/QSerialPort>
+
+#include <qwt_plot.h>
+#include <qwt_plot_grid.h>
+
+#include <qwt_legend.h>
+
+#include <qwt_plot_curve.h>
+#include <qwt_symbol.h>
+
+#include <qwt_plot_magnifier.h>
+
+#include <qwt_plot_panner.h>
+
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
+//--//
+#include <qwt_plot_curve.h>
+
+#include <qwt_plot_directpainter.h>
+#include <qwt_system_clock.h>
+
+#include <qwt_interval.h>
+
+#include <QTimer>
+#include <QTime>
+
+#include <QDir>
+#include <QFileDialog>
+
+#include <doubleslider.h>
 
 //!         Конструктор базового класса
 //! [0]
@@ -202,7 +237,7 @@ void MainWindow::my_connect_end(){
     ui->doubleSpinBox->setRange(0,4);
     ui->doubleSpinBox->setSingleStep(0.1);
     ui->doubleSpinBox->setValue(0);
-    ui->verticalScrollBar->setRange(0,4);
+    //ui->verticalScrollBar->setRange(0,4);
     ui->verticalScrollBar->setValue(0);
     connect(ui->doubleSpinBox, SIGNAL(valueChanged(double)),this,SLOT(activate_curve_trigger(double)));
     connect(ui->set_trigger,SIGNAL(clicked()), this, SLOT(doubleSpinBox_active()));
@@ -213,12 +248,24 @@ void MainWindow::my_connect_end(){
     connect(tmr, SIGNAL(timeout()), this, SLOT(plot_time_update()));
 
     connect(ui->save_plot_in_jpeg, SIGNAL(clicked(bool)), this, SLOT(save_plot()));
+
+    //Для слайдера
+    connect(ui->verticalScrollBar, SIGNAL(doubleValueChanged(double)), ui->doubleSpinBox, SLOT(setValue(double)));
+
 }
 
 MainWindow::~MainWindow()
 {
     delete settings;
     delete ui;
+    //
+    delete status;
+    delete serial;
+    delete tmr;
+    //кривая АЦП
+    delete curve;
+    //кривая триггера
+    delete curve_trig;
 }
 
 //! [4]
