@@ -94,6 +94,7 @@
 
 #include <doubleslider.h>
 
+#include <QScrollArea>
 //!         Конструктор базового класса
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
@@ -250,6 +251,11 @@ void MainWindow::my_connect_end(){
 
     //Для слайдера
     connect(ui->verticalScrollBar, SIGNAL(doubleValueChanged(double)), ui->doubleSpinBox, SLOT(setValue(double)));
+
+    labelLayout= new QVBoxLayout(ui->scrollAreaWidgetContents);
+
+
+
 
 }
 
@@ -477,12 +483,23 @@ void MainWindow::doubleSpinBox_deactive(){
 void MainWindow::save_plot(){
     QPixmap screen(ui->qwtPlot->width(),ui-> qwtPlot->height());
     screen = QPixmap::grabWidget(ui->qwtPlot);
-    QString fileName = QFileDialog::getSaveFileName(0, "Сохранить как...", QDir::currentPath(), "All types(*.*);;PNG (*.png);;JPG (*jpeg *jpg);; BMP (*.bmp)");
-    if (fileName.isNull())
-        return;
-    screen.save(fileName,0,100);
-}
+     saveImage_tab_2(screen);
 
+
+
+
+    //Для сохранения значений
+//    QString fileName = QFileDialog::getSaveFileName(0, "Сохранить как...", QDir::currentPath(), "All types(*.*);;PNG (*.png);;JPG (*jpeg *jpg);; BMP (*.bmp)");
+//    if (fileName.isNull())
+//        return;
+//    screen.save(fileName,0,100);
+}
+ void MainWindow::saveImage_tab_2(QPixmap scr){
+     QLabel* lbl = new QLabel(ui->tab_2);
+     lbl->setPixmap(scr);
+     //sa->setWidget(lbl);
+     labelLayout->addWidget(lbl);
+ }
 
 
 

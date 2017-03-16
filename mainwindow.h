@@ -55,7 +55,8 @@
 #include <QtCore/QtGlobal>
 #include <QMainWindow>
 #include <QtSerialPort/QSerialPort>
-
+#include <qscrollarea.h>
+#include <QHBoxLayout>
 
 QT_BEGIN_NAMESPACE
 //Предварительное объявление классов
@@ -100,6 +101,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void saveImage_tab_2(QPixmap scr);
 private slots:
     void openSerialPort();
     void closeSerialPort();
@@ -145,6 +147,10 @@ private:
     bool trigger_active = false;
     //если значение выше порогового- вывод всех последующих значений
     bool curve_trigger = false;
+    //
+    QScrollArea* sa ;
+    //QHBoxLayout* H_lay;
+    QVBoxLayout *labelLayout;
 };
 
 #endif // MAINWINDOW_H
